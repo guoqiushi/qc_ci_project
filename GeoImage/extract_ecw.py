@@ -8,12 +8,12 @@ shape_boundary=[117787,488285,121214,484267]
 def crop_ecw(in_path,out_path,coordinates):
     subprocess.call('gdal_translate -of GTIFF -srcwin '+coordinates+in_path+' '+out_path)
 
-def generate_srcwin(width,N,sha_boundary,ecw_boundary,step):
+def generate_srcwin(width,N_x,N_y,sha_boundary,ecw_boundary,step):
     x_min=(sha_boundary[0]-ecw_boundary[0])*10
     y_min=(ecw_boundary[1]-sha_boundary[1])*10
     coor_list=[]
-    for i in range(N):
-        for j in range(N):
+    for i in range(N_y):
+        for j in range(N_x):
             x_coor=x_min+j*step
             y_coor=y_min+i*step
             coordinate=str(x_coor)+' '+str(y_coor)+' '+str(width)+' '+str(width)+' '
