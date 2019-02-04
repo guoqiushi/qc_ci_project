@@ -113,8 +113,8 @@ with torch.no_grad():
     correct = 0
     total = 0
     for images_pair in zip(val_loader,val2_loader):
-        image_1 = image_pair[0][0].to(device)
-        image_2 = image_pair[1][0].to(device)
+        image_1 = images_pair[0][0].to(device)
+        image_2 = images_pair[1][0].to(device)
         labels = image_pair[0][1].to(device)
         outputs = model(image_1,image_2)
         _, predicted = torch.max(outputs.data, 1)
