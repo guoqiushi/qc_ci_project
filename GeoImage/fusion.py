@@ -66,16 +66,20 @@ device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 class MyModel(nn.Module):
     def __init__(self):
         super(MyModel, self).__init__()
-        self.cnn = models.resnet18(pretrained=False)
-        self.cnn.fc = nn.Linear(
+        self.cnn_1 = models.resnet18(pretrained=True)
+        self.cnn_1.fc = nn.Linear(
+            self.cnn.fc.in_features, 20)
+        
+        self.cnn_2 = models.resnet18(pretrained=True)
+        self.cnn_2.fc = nn.Linear(
             self.cnn.fc.in_features, 20)
 
         self.fc1 = nn.Linear(20 + 20, 60)
         self.fc2 = nn.Linear(60, 2)
 
     def forward(self, image_1, image_2):
-        x1 = self.cnn(image_1)
-        x2 = self.cnn(image_2)
+        x1 = self.cnn_1(image_1)
+        x2 = self.cnn_2(image_2)
 
         x = torch.cat((x1, x2), dim=1)
         x = F.relu(self.fc1(x))
