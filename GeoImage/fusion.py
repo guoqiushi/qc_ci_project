@@ -10,7 +10,10 @@ import time
 import os
 import copy
 import torch.nn.functional as F
+import os
 
+os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"
+os.environ["CUDA_VISIBLE_DEVICES"]="0"
 
 num_epochs = 5
 num_classes = 10
@@ -68,20 +71,20 @@ class MyModel(nn.Module):
         super(MyModel, self).__init__()
         self.cnn_1 = models.resnet18(pretrained=True)
         self.cnn_1.fc = nn.Linear(
-            self.cnn.fc.in_features, 20)
+            self.cnn_1.fc.in_features, 20)
         
         self.cnn_2 = models.resnet18(pretrained=True)
         self.cnn_2.fc = nn.Linear(
-            self.cnn.fc.in_features, 20)
+            self.cnn_2.fc.in_features, 20)
 
-        self.fc1 = nn.Linear(20 + 20, 60)
+        self.fc1 = nn.Linear(20 , 60)
         self.fc2 = nn.Linear(60, 2)
 
-    def forward(self, image_1, image_2):
-        x1 = self.cnn_1(image_1)
-        x2 = self.cnn_2(image_2)
+    def forward(self, image_1):
+        x = self.cnn_1(image_1)
+        #x2 = self.cnn_2(image_2)
 
-        x = torch.cat((x1, x2), dim=1)
+        #x = torch.cat((x1, x2), dim=1)
         x = F.relu(self.fc1(x))
         x = self.fc2(x)
         return x
