@@ -15,9 +15,9 @@ import os
 os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"
 os.environ["CUDA_VISIBLE_DEVICES"]="0"
 
-num_epochs = 5
-num_classes = 10
-batch_size = 100
+num_epochs = 15
+num_classes = 2
+batch_size = 4
 learning_rate = 0.001
 
 data_transforms = {
@@ -51,7 +51,7 @@ data_dir = '/home/guoqiushi/Documents/task3'
 image_datasets = {x: datasets.ImageFolder(os.path.join(data_dir, x),
                                           data_transforms[x])
                   for x in ['train', 'val','fusion','val_2']}
-dataloaders = {x: torch.utils.data.DataLoader(image_datasets[x], batch_size=1,
+dataloaders = {x: torch.utils.data.DataLoader(image_datasets[x], batch_size=4,
                                              shuffle=True, num_workers=4)
               for x in ['train', 'val','fusion','val_2']}
 
@@ -77,16 +77,18 @@ class MyModel(nn.Module):
         self.cnn_2.fc = nn.Linear(
             self.cnn_2.fc.in_features, 20)
 
-        self.fc1 = nn.Linear(20 , 60)
-        self.fc2 = nn.Linear(60, 2)
+        self.fc1 = nn.Linear(40 , 20)
+        self.fc3 = nn.Linear(20,10)
+        self.fc2 = nn.Linear(10, 2)
 
     def forward(self, image_1):
-        x = self.cnn_1(image_1)
-        #x2 = self.cnn_2(image_2)
+        x1 = self.cnn_1(image_1)
+        x2 = self.cnn_2(image_2)
 
-        #x = torch.cat((x1, x2), dim=1)
+        x = torch.cat((x1, x2), dim=1)
         x = F.relu(self.fc1(x))
-        x = self.fc2(x)
+        x = F.relu(self.fc2(x))
+        x = self.fc3(x)
         return x
 
 model=MyModel().to(device)
@@ -123,8 +125,8 @@ with torch.no_grad():
         image_1 = images_pair[0][0].to(device)
         image_2 = images_pair[1][0].to(device)
         labels = image_pair[0][1].to(device)
-        #outputs = model(image_1,image_2)
-        outputs = model(image_1)
+        outputs = model(image_1,image_2)
+        #outputs = model(image_1)
         _, predicted = torch.max(outputs.data, 1)
         total += labels.size(0)
         correct += (predicted == labels).sum().item()
